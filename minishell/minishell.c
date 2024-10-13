@@ -6,41 +6,22 @@
 /*   By: bbadda <bbadda@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 10:14:08 by bbadda            #+#    #+#             */
-/*   Updated: 2024/10/13 13:51:34 by bbadda           ###   ########.fr       */
+/*   Updated: 2024/10/13 18:56:41 by bbadda           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_print(int p)
-{
-	if ((p <= 126 && p >= 32))
-		return (1);
-	return (0);
-}
-
-int	is_digit(int nb)
-{
-	if ((nb <= 57 && nb > 48))
-		return (1);
-	return (0);
-}
-
 int	check_env(char *cmd)
 {
 	int i;
-	// bool pair = true;
 
 	i = 0;
+	
 	if (cmd[i] == '$')
 	{
 		if (cmd[i])
 			i++;
-		// while (cmd[i] == '$')
-		// {
-		// 	pair = !pair;
-		// 	i++;
-		// }
 		if (cmd[i] == '$')
 			return (0);
 		if (is_digit(cmd[i]))
@@ -65,6 +46,7 @@ char	*replace_env(t_env *e, char *s)
 
 char	*check_and_replace_env(char *s_command, t_env *e)
 {
+	int i;
 	if (s_command)
 	{
 		if (check_env(s_command) == 1)
@@ -76,40 +58,7 @@ char	*check_and_replace_env(char *s_command, t_env *e)
 		if (check_env(s_command) == 3)
 			printf("baaad env \n");
 	}
-	printf("ss = %s\n", s_command);
 	return (s_command);
-}
-
-
-void	check_quotes(char c, bool in_quotes, bool in_single_quotes)
-{
-	if (!in_quotes && c == '\'')
-			in_single_quotes = !in_single_quotes;
-	else if (!in_single_quotes && c == '\"')
-		in_quotes = !in_quotes;
-}
-
-t_index	max_files_args(char **s_command)
-{
-	t_index	index;
-
-	index.i = 0;
-	index.j = 1;
-	index.k = 0;
-	while (s_command[index.j])
-	{
-		if (s_command[index.j] &&(!strcmp(s_command[index.j], "<") || !strcmp(s_command[index.j], ">") 
-			|| !strcmp(s_command[index.j], "<<") || !strcmp(s_command[index.j], ">>")))
-		{
-			index.i++;
-			index.j++;	
-		}
-		else if (s_command[index.j])
-			index.k++;
-		if (s_command[index.j])
-			index.j++;	
-	}
-	return (index);
 }
 
 void	__token(char **s_command, t_con *c, t_env *e)
@@ -117,7 +66,7 @@ void	__token(char **s_command, t_con *c, t_env *e)
 	t_index	index;
 
 	index.i = 0;
-	index.j = 1;
+	index.j = 0;
 	index.k = 0;
 	while (s_command[index.j])
 	{
@@ -125,21 +74,16 @@ void	__token(char **s_command, t_con *c, t_env *e)
 		if (s_command[index.j] &&(!strcmp(s_command[index.j], "<") || !strcmp(s_command[index.j], ">") 
 			|| !strcmp(s_command[index.j], "<<") || !strcmp(s_command[index.j], ">>")))
 		{
-			c->file[index.i].opr = strdup(s_command[index.j]);
+			c->file[index.i].opr = parse_strdup(s_command[index.j]);
 			index.j++;
 			s_command[index.j] = check_and_replace_env(s_command[index.j], e);
 			if (s_command[index.j])
-			{
-				// if (cmp(c->file[index.i].opr, "<<"))
-				// 	c->file[index.i].file_name = strdup(replace_env(e, s_command[index.j]));
-				// else
-					c->file[index.i].file_name = strdup(s_command[index.j]);
-			}
+				c->file[index.i].file_name = parse_strdup(s_command[index.j]);
 			index.i++;
 		}
 		else if (s_command[index.j])
 		{
-			c->arg[index.k]=  strdup(s_command[index.j]);
+			c->arg[index.k]=  parse_strdup(s_command[index.j]);
 			index.k++;
 		}
 		if (s_command[index.j])
@@ -147,18 +91,18 @@ void	__token(char **s_command, t_con *c, t_env *e)
 	}
 	c->file[index.i].opr = NULL;
 	c->arg[index.k] = NULL;
-	// printf("c.cmd : %d\n", c->command);
-	// int i = 0;
-	// while (c->file[i].opr)
-	// {
-	// 	if (cmp(c->file[i].opr, "<<"))
-	// 	{
-	// 		c->file[i].file_name = strdup("bilalll");
-	// 	}
-	// 	i++;
-	// }
 }
 
+// char	*get_without_q(char *cmd)
+// {
+// 	int i;
+
+// 	i = 0;
+// 	while (cmd[i])
+// 	{
+		
+// 	}
+// }
 t_token	*toke_lexer(char **command, t_token *token, t_env *e)
 {
 	int		i;
@@ -175,6 +119,7 @@ t_token	*toke_lexer(char **command, t_token *token, t_env *e)
 		syntax_error(s);
 		s_command = parse_split(s, ' ');
 		free(s);
+		// s_command = get_without_q(s_command);
 		index = max_files_args(s_command);
 		c.file = malloc(index.i * sizeof(t_opr));
 		c.arg = malloc(index.k *sizeof(char *));

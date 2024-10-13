@@ -6,11 +6,25 @@
 /*   By: bbadda <bbadda@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 11:26:36 by bbadda            #+#    #+#             */
-/*   Updated: 2024/10/12 21:32:52 by bbadda           ###   ########.fr       */
+/*   Updated: 2024/10/13 18:55:42 by bbadda           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	is_print(int p)
+{
+	if ((p <= 126 && p >= 32))
+		return (1);
+	return (0);
+}
+
+int	is_digit(int nb)
+{
+	if ((nb <= 57 && nb > 48))
+		return (1);
+	return (0);
+}
 
 char	*add_spaces(char *cmd)
 {

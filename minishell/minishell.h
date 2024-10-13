@@ -6,7 +6,7 @@
 /*   By: bbadda <bbadda@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 10:14:11 by bbadda            #+#    #+#             */
-/*   Updated: 2024/10/12 21:35:25 by bbadda           ###   ########.fr       */
+/*   Updated: 2024/10/13 18:59:22 by bbadda           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ typedef struct s_token
 	char				*command;
 	char				**arg;
 	t_opr				*file;
-	// pid
 	struct s_token		*next;
 	struct s_token		*prev;
 }t_token;
@@ -127,9 +126,8 @@ void		*__calloc(size_t count, size_t size);
 int			is_special_char(char c);
 void		check_quotes(char c, bool in_quotes, bool in_single_quotes);
 // --------------------tokenization_functions-----------------//
-// int			tokenization(const char *command, t_token *main);
-// void 		classify_token_type(t_con *c, char *command);
-void		get_command(int j, t_token *token, t_con *c);
+t_index		max_files_args(char **s_command);
+
 // --------------------syntax_error_functions-----------------//
 int			syntax_error(char *command);
 int			qoutes_error(char *command);
@@ -141,6 +139,9 @@ t_env   	*get_env( char **env);
 char		*add_spaces(char *cmd);
 int 		__is_redir(char c);
 int 		__is_herdoc(char *s);
+int			is_print(int p);
+int			is_digit(int nb);
+int			is_print(int p);
 int			pipe_error(char *command, int j);
 // -------------------libft-----------------------------------//
 int			parse_strlen(const char *str);
@@ -148,6 +149,7 @@ char		*parse_substr(char const *str, unsigned int start, size_t len);
 char		**parse_split(char const *s, char c);;
 char		*parse_strtrim(char const *str, char const *set);
 char		*parse_strdup(const char *src);
+char		*parse_strjoin(char const *s1, char const *s2);
 
 
 void 		print_full_command(int j, t_token *token);
