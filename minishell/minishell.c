@@ -6,20 +6,50 @@
 /*   By: bbadda <bbadda@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 10:14:08 by bbadda            #+#    #+#             */
-/*   Updated: 2024/10/12 21:30:50 by bbadda           ###   ########.fr       */
+/*   Updated: 2024/10/13 13:51:34 by bbadda           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int	is_print(int p)
+{
+	if ((p <= 126 && p >= 32))
+		return (1);
+	return (0);
+}
+
+int	is_digit(int nb)
+{
+	if ((nb <= 57 && nb > 48))
+		return (1);
+	return (0);
+}
+
 int	check_env(char *cmd)
 {
-	if (cmd[0] == '$')
+	int i;
+	// bool pair = true;
+
+	i = 0;
+	if (cmd[i] == '$')
 	{
-		if (cmd[1] && cmd[1] != '?')
+		if (cmd[i])
+			i++;
+		// while (cmd[i] == '$')
+		// {
+		// 	pair = !pair;
+		// 	i++;
+		// }
+		if (cmd[i] == '$')
+			return (0);
+		if (is_digit(cmd[i]))
+			return (2);
+		if (cmd[i] == '\'' || cmd[i] == '\"')
+			return (3);
 		return (1);
 	}
-	return (0);	
+	return (-1);
 }
 
 char	*replace_env(t_env *e, char *s)
@@ -32,6 +62,24 @@ char	*replace_env(t_env *e, char *s)
 	}
 	return (NULL);
 }
+
+char	*check_and_replace_env(char *s_command, t_env *e)
+{
+	if (s_command)
+	{
+		if (check_env(s_command) == 1)
+			s_command = parse_strdup(replace_env(e, s_command + 1));
+		if (check_env(s_command) == 0)
+			s_command = parse_strdup(s_command + 1);
+		if (check_env(s_command) == 2)
+			s_command = parse_strdup(s_command + 2);
+		if (check_env(s_command) == 3)
+			printf("baaad env \n");
+	}
+	printf("ss = %s\n", s_command);
+	return (s_command);
+}
+
 
 void	check_quotes(char c, bool in_quotes, bool in_single_quotes)
 {
@@ -73,15 +121,13 @@ void	__token(char **s_command, t_con *c, t_env *e)
 	index.k = 0;
 	while (s_command[index.j])
 	{
-		if (check_env(s_command[index.j]))
-			s_command[index.j] = strdup(replace_env(e, s_command[index.j] + 1));
+		s_command[index.j] = check_and_replace_env(s_command[index.j], e);
 		if (s_command[index.j] &&(!strcmp(s_command[index.j], "<") || !strcmp(s_command[index.j], ">") 
 			|| !strcmp(s_command[index.j], "<<") || !strcmp(s_command[index.j], ">>")))
 		{
 			c->file[index.i].opr = strdup(s_command[index.j]);
 			index.j++;
-			if (check_env(s_command[index.j]))
-				s_command[index.j] = strdup(replace_env(e, s_command[index.j] + 1));
+			s_command[index.j] = check_and_replace_env(s_command[index.j], e);
 			if (s_command[index.j])
 			{
 				// if (cmp(c->file[index.i].opr, "<<"))
@@ -158,7 +204,6 @@ void	priiint(t_token *token)
 		int j = 0;
 		while (token->file[j].opr)
 		{
-			printf("j === %d\n", j);
 			printf("file name[%d] : %s\n", j, token->file[j].file_name);
 			printf("opr[%d] : %s\n", j, token->file[j].opr);
 			// if (token->prev)

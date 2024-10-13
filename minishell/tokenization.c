@@ -6,7 +6,7 @@
 /*   By: bbadda <bbadda@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 11:58:05 by bbadda            #+#    #+#             */
-/*   Updated: 2024/10/09 10:34:20 by bbadda           ###   ########.fr       */
+/*   Updated: 2024/10/13 12:02:15 by bbadda           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,92 +138,91 @@ int	is_digit(int nb, int zero)
 }
 
 // main tokenization function
-// int tokenization(const char *command, t_token *main)
-// {
-// 	bool in_quotes = false;
-// 	bool in_single_quotes = false;
-// 	bool in_the_first =  true;
-// 	int i = 0;
-// 	int j = 0;
-// 	int buffer_index = 0;
-// 	char buffer[256];
+int tokenization(const char *command, t_token *main)
+{
+	bool in_quotes = false;
+	bool in_single_quotes = false;
+	bool in_the_first =  true;
+	int i = 0;
+	int j = 0;
+	int buffer_index = 0;
+	char buffer[256];
 
-// 	while (command[i])
-// 	{
-// 		if (command[i] == '$')
-// 		{
-// 			while (command[++i])
-// 			{
-// 				if (command[i] == '$')
-// 				{
-// 					buffer[buffer_index++] = command[i];
-// 					add_token(buffer, &buffer_index, main, &j);
-// 					in_the_first = false;
-// 					i++;
-// 				}
-// 				if (is_digit(command[i], 1) && in_the_first)
-// 				{
-// 					buffer[buffer_index++] = command[i];
-// 					add_token(buffer, &buffer_index, main, &j);
-// 					in_the_first = false;
-// 					i++;
-// 				}
-// 				if (is_digit(command[i], 0) && in_the_first)
-// 					i++;
-// 				else if (is_print(command[i]))
-// 					buffer[buffer_index++] = command[i];
-// 				else
-// 					break ;
-// 				in_the_first = false;
-// 			}
-// 		}
-// 		if (command[i] == '"')
-// 		{
-// 			if (in_single_quotes == false)
-// 			{
-// 				in_quotes = !in_quotes;
-// 				add_token(buffer, &buffer_index, main, &j);
-// 				handle_quotes('"', main, &j);
-// 			}
-// 			else
-// 				buffer[buffer_index++] = command[i];
-// 		}
-// 		else if (command[i] == '\'')
-// 		{
-// 			if (in_quotes == false)
-// 			{
-// 				in_single_quotes = !in_single_quotes;
-// 				add_token(buffer, &buffer_index, main, &j);
-// 				handle_quotes('\'', main, &j);
-// 			}
-// 			else
-// 				buffer[buffer_index++] = command[i];
-// 		}
-// 		else if ((command[i] == ' ' || command[i] == '|' || is_redir(command[i])) 
-// 			&& in_quotes == false && in_single_quotes == false)
-// 		{
-// 			add_token(buffer, &buffer_index, main, &j);
-// 			if (command[i] == ' ')
-// 				handle_spaces(command, &i, main, &j);
-// 			else if (command[i] == '|')
-// 			{
-// 				main[j].command= strdup("|");
-// 				main[j].cmd_type = PIPE;
-// 				j++;
-// 			}
-// 			else if (is_redir(command[i]))
-// 			{
-// 				handle_redir_and_herdoc(command, &i, main, &j);
-// 				add_token(buffer, &buffer_index, main, &j);
-// 			}
-// 		}
-// 		else
-// 			buffer[buffer_index++] = command[i];
-// 		i++;
-// 	}
-// 	add_token(buffer, &buffer_index, main, &j);
-// 	return j;
-// }
+	while (command[i])
+	{
+		if (command[i] == '$')
+		{
+			while (command[++i])
+			{
+				if (command[i] == '$')
+				{
+					buffer[buffer_index++] = command[i];
+					add_token(buffer, &buffer_index, main, &j);
+					in_the_first = false;
+					i++;
+				}
+				if (is_digit(command[i], 1) && in_the_first)
+				{
+					buffer[buffer_index++] = command[i];
+					add_token(buffer, &buffer_index, main, &j);
+					in_the_first = false;
+					i++;
+				}
+				if (is_digit(command[i], 0) && in_the_first)
+					i++;
+				else if (is_print(command[i]))
+					buffer[buffer_index++] = command[i];
+				else
+					break ;
+				in_the_first = false;
+			}
+		}
+		if (command[i] == '"')
+		{
+			if (in_single_quotes == false)
+			{
+				in_quotes = !in_quotes;
+				add_token(buffer, &buffer_index, main, &j);
+				handle_quotes('"', main, &j);
+			}
+			else
+				buffer[buffer_index++] = command[i];
+		}
+		else if (command[i] == '\'')
+		{
+			if (in_quotes == false)
+			{
+				in_single_quotes = !in_single_quotes;
+				add_token(buffer, &buffer_index, main, &j);
+				handle_quotes('\'', main, &j);
+			}
+			else
+				buffer[buffer_index++] = command[i];
+		}
+		else if ((command[i] == ' ' || command[i] == '|' || is_redir(command[i])) 
+			&& in_quotes == false && in_single_quotes == false)
+		{
+			add_token(buffer, &buffer_index, main, &j);
+			if (command[i] == ' ')
+				handle_spaces(command, &i, main, &j);
+			else if (command[i] == '|')
+			{
+				main[j].command= strdup("|");
+				j++;
+			}
+			else if (is_redir(command[i]))
+			{
+				handle_redir_and_herdoc(command, &i, main, &j);
+				add_token(buffer, &buffer_index, main, &j);
+			}
+		}
+		else
+			buffer[buffer_index++] = command[i];
+		i++;
+	}
+	add_token(buffer, &buffer_index, main, &j);
+	return j;
+}
 
 // int main ()
 // {
